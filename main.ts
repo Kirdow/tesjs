@@ -3,5 +3,5 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-const tes = require("./lib/tes");
-module.exports = tes;
+import TES from './lib/tes'
+export default TES

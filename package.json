@@ -25,7 +25,7 @@
   ],
   "scripts": {
     "test": "mocha ./test/tests.js --bail --exit",
-    "build": "node ./scripts/build.js && node ./scripts/docs.js"
+    "build": "tsc"
   },
   "author": "Mitchell Adair (https://github.com/mitchwadair)",
   "license": "MIT",
@@ -35,16 +35,21 @@
   "homepage": "https://www.tesjs.net",
   "dependencies": {
     "express": "4.18.2",
-    "node-fetch": "2.6.7",
-    "ws": "8.10.0"
+    "websocket": "^1.0.34",
+    "ws": "^8.18.1"
   },
   "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.2",
+    "@types/ws": "^8.5.14",
     "chai": "4.3.6",
     "esbuild": "0.15.13",
     "jsdoc-to-markdown": "8.0.0",
     "mocha": "10.0.0",
     "nock": "13.2.9",
+    "node-fetch": "^3.3.2",
     "sinon": "14.0.0",
-    "supertest": "6.2.3"
+    "supertest": "6.2.3",
+    "typescript": "~5.4.5"
   }
 }
