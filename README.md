@@ -7,6 +7,7 @@
     <a href="LICENSE"><img src='https://img.shields.io/npm/l/tesjs' alt="license"></a>
     <a href="https://www.npmjs.com/package/tesjs"><img src='https://img.shields.io/npm/dt/tesjs' alt="downloads"></a>
 </p>
+<ins>**NOTE(Kirdow)**</ins>: *This repository is a fork made for use specifically with my own private bot. It's only pulled from upstream when necessary to fix core issues. If you have issues with this repository, don't reach out to upstream as it's not an issue with theirs.*
 
 A module to streamline the use of Twitch EventSub in Node.js and Web applications
 
