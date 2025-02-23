@@ -25,36 +25,57 @@ interface WebhookRequest extends Request {
     } & Request['headers']
 }
 
-const verify = (secret: string) => (req: WebhookRequest, res: Response, buf: Buffer): void => {
-    Logger.debug("Verifying webhook request");
-    req.valid_signature = false;
+const verifySignature = (secret: string) => {
+    return (req: WebhookRequest, res: Response, next: NextFunction): void => {
+        Logger.debug("Verifying webhook request");
+        req.valid_signature = false;
 
-    if (req.headers && req.headers["twitch-eventsub-message-signature"]) {
-        Logger.debug("Request contains message signature, calculating verification signature");
+        const rawBody = (req as any).rawBody
 
-        const id = req.headers["twitch-eventsub-message-id"];
-        const timestamp = req.headers["twitch-eventsub-message-timestamp"];
-        const [algo, signature] = req.headers["twitch-eventsub-message-signature"].split("=");
+        if (req.headers && req.headers["twitch-eventsub-message-signature"]) {
+            Logger.debug("Request contains message signature, calculating verification signature");
 
-        const calculatedSignature = crypto
-            .createHmac(algo, secret)
-            .update(`${id}${timestamp}${buf}`)
-            .digest('hex')
+            const id = req.headers["twitch-eventsub-message-id"];
+            const timestamp = req.headers["twitch-eventsub-message-timestamp"];
+            const [algo, signature] = req.headers["twitch-eventsub-message-signature"].split("=");
 
-        if (crypto.timingSafeEqual(Buffer.from(calculatedSignature), Buffer.from(signature))) {
-            Logger.debug("Request message signature match");
-            req.valid_signature = true;
-        } else {
+            const calculatedSignature = crypto
+                .createHmac(algo, secret)
+                .update(`${id}${timestamp}${rawBody}`)
+                .digest('hex')
+
+            if (crypto.timingSafeEqual(Buffer.from(calculatedSignature), Buffer.from(signature))) {
+                Logger.debug("Request message signature match");
+                req.valid_signature = true;
+                next()
+                return
+            }
+
             Logger.debug(
                 `Request message signature ${signature} does not match calculated signature ${calculatedSignature}`
             );
             res.status(403).send("Request signature mismatch");
+            return
         }
-    } else {
+
         Logger.debug("Received unauthorized request to webhooks endpoint");
         res.status(401).send("Unauthorized request to EventSub webhook");
-    }
-};
+    };
+}
+
+const rawBodyMiddleware = (req: Request, res: Response, next: NextFunction) => {
+    let data = ''
+    req.setEncoding('utf8')
+
+    req.on('data', (chunk: string) => {
+        data += chunk
+    })
+
+    req.on('end', () => {
+        ;(req as any).rawBody = data
+        next()
+    })
+}
 
 export default function createWebhookServer(
     server?: Express,
@@ -74,9 +95,13 @@ export default function createWebhookServer(
         ...config
     }
 
+
+
     whserver.post(
         '/teswh/event',
-        //express.json({ verify: verify(secret) }),
+        rawBodyMiddleware,
+        express.json(),
+        verifySignature(secret),
         (req: WebhookRequest, res: Response) => {
             Logger.debug("Incoming webhook event request")
             if (!req.valid_signature) {
