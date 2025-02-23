@@ -65,8 +65,6 @@ const verifySignature = (secret: string) => {
 
 const rawBodyMiddleware = (req: Request, res: Response, next: NextFunction) => {
     let data = ''
-    req.setEncoding('utf8')
-
     req.on('data', (chunk: string) => {
         data += chunk
     })
