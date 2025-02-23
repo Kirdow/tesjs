@@ -96,17 +96,24 @@ class AuthManager {
                     refreshSnippet = `&refresh_token=${this._refreshToken}`
                 }
 
+                Logger.debug("Requesting token")
+
                 const res = await fetch(
                     `${AUTH_API_URL}/token?client_id=${this._clientID}&client_secret=${this._clientSecret}&grant_type=${grantType}${refreshSnippet}`,
                     { method: "POST" }
                 )
 
+                Logger.debug("Got token")
+
                 if (res.ok) {
+                    Logger.debug("Getting token json")
                     const { access_token, refresh_token } = await res.json() as { access_token: string, refresh_token: string }
+                    Logger.debug("Got token json. Has auth token: " + (!!access_token))
                     this._authToken = access_token
                     this._refreshToken = refresh_token
                     this._resetValidationInterval()
                 } else {
+                    Logger.debug("Failed to get access token")
                     const { message } = await res.json() as { message: string }
                     throw new Error(message)
                 }
@@ -114,6 +121,8 @@ class AuthManager {
         } catch (err) {
             if (err instanceof Error) {
                 Logger.error(`Error refreshing app access token: ${err.message}`)
+            } else {
+                Logger.error(`Error refreshing app access token: ${err}`)
             }
             throw err
         }
