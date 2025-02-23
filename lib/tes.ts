@@ -266,6 +266,7 @@ class TES {
     async subscribe(type: string, condition: Record<string, unknown>, version: string = "1"): Promise<Subscription> {
         Logger.debug(`Subscribing to topic with type ${type} and condition ${printObject(condition)}`);
         const token = await AuthManager.getInstance().getToken();
+        Logger.debug(`Successfully waited for token`)
         const headers = {
             "client-id": this.clientID,
             Authorization: `Bearer ${token}`,

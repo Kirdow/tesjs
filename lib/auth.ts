@@ -68,7 +68,8 @@ class AuthManager {
                     Logger.error(`${message}.  Something catastrophic has happened!`)
                     reject(message)
                 } else {
-                    setTimeout(retry)
+                    Logger.debug("Waiting for token")
+                    setTimeout(() => retry(), 10000)
                 }
             }
             retry()
