@@ -1,11 +1,25 @@
 {
     "compilerOptions": {
-        "noImplicitAny": true,
+        "target": "es6",
+        "module": "commonjs",
+        "lib": [
+            "es6",
+            "dom"
+        ],
         "strict": true,
-        "moduleResolution": "node",
-        "target": "ESNext",
-        "module": "ESNext",
+        "noImplicitAny": true,
         "esModuleInterop": true,
-        "resolveJsonModule": true
-    }
+        "declaration": true,
+        "outDir": "dist",
+        "sourceMap": false
+    },
+    "include": [
+        "lib/**/*",
+        "main.ts"
+    ],
+    "exclude": [
+        "node_modules",
+        "**/*.spec.ts",
+        "dist"
+    ]
 }

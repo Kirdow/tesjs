@@ -17,7 +17,8 @@
     "webhook",
     "websocket"
   ],
-  "main": "main.js",
+  "main": "dist/main.js",
+  "typedocMain": "main.ts",
   "files": [
     "/lib",
     "main.js",
@@ -25,7 +26,8 @@
   ],
   "scripts": {
     "test": "mocha ./test/tests.js --bail --exit",
-    "build": "tsc"
+    "build": "tsc",
+    "dev": "tsc --watch"
   },
   "author": "Mitchell Adair (https://github.com/mitchwadair)",
   "license": "MIT",
