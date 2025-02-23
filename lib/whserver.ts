@@ -73,6 +73,7 @@ const rawBodyMiddleware = (req: Request, res: Response, next: NextFunction) => {
 
     req.on('end', () => {
         ;(req as any).rawBody = data
+        Logger.debug(`RawBody: ${data}`)
         next()
     })
 }
