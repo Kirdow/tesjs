@@ -13,7 +13,7 @@ const levels: Record<LevelType, number> = {
     none: 4,
 };
 
-let level: LevelType = "warn";
+let level: LevelType = "error";
 
 const createLevel = (lvl: LevelType) => {
     return (message: string): void => {
