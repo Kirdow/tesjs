@@ -298,6 +298,8 @@ class TES {
             version,
         };
 
+        Logger.debug(`Requesting `)
+
         const data = await RequestManager.request(SUBS_API_URL, {
             method: "POST",
             body: JSON.stringify(body),

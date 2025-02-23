@@ -76,9 +76,11 @@ export default function createWebhookServer(
 
     whserver.post(
         '/teswh/event',
-        express.json({ verify: verify(secret) }),
+        //express.json({ verify: verify(secret) }),
         (req: WebhookRequest, res: Response) => {
+            Logger.debug("Incoming webhook event request")
             if (!req.valid_signature) {
+                Logger.debug("Incoming webhook event request was not valid")
                 return
             }
 
