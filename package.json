@@ -37,6 +37,7 @@
   "homepage": "https://www.tesjs.net",
   "dependencies": {
     "express": "4.18.2",
+    "raw-body": "^3.0.0",
     "websocket": "^1.0.34",
     "ws": "^8.18.1"
   },

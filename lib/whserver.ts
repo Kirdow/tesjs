@@ -4,6 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 import type { Express, Request, Response, NextFunction } from 'express'
+import getRawBody from 'raw-body'
 import express from 'express'
 import crypto from 'crypto'
 import EventManager from './events'
@@ -26,11 +27,16 @@ interface WebhookRequest extends Request {
 }
 
 const verifySignature = (secret: string) => {
-    return (req: WebhookRequest, res: Response, next: NextFunction): void => {
+    return async (req: WebhookRequest, res: Response, next: NextFunction): Promise<void> => {
         Logger.debug("Verifying webhook request");
         req.valid_signature = false;
 
-        const rawBody = (req as any).rawBody
+        const rawBody = await getRawBody(req, {
+            length: req.headers['content-length'],
+            limit: '1mb'
+        })
+
+        ;(req as any).rawBody = rawBody
 
         if (req.headers && req.headers["twitch-eventsub-message-signature"]) {
             Logger.debug("Request contains message signature, calculating verification signature");
@@ -47,6 +53,8 @@ const verifySignature = (secret: string) => {
             if (crypto.timingSafeEqual(Buffer.from(calculatedSignature), Buffer.from(signature))) {
                 Logger.debug("Request message signature match");
                 req.valid_signature = true;
+
+                req.body = JSON.parse(rawBody.toString())
                 next()
                 return
             }
@@ -61,19 +69,6 @@ const verifySignature = (secret: string) => {
         Logger.debug("Received unauthorized request to webhooks endpoint");
         res.status(401).send("Unauthorized request to EventSub webhook");
     };
-}
-
-const rawBodyMiddleware = (req: Request, res: Response, next: NextFunction) => {
-    let data = ''
-    req.on('data', (chunk: string) => {
-        data += chunk
-    })
-
-    req.on('end', () => {
-        ;(req as any).rawBody = data
-        Logger.debug(`RawBody: ${data}`)
-        next()
-    })
 }
 
 export default function createWebhookServer(
@@ -98,8 +93,6 @@ export default function createWebhookServer(
 
     whserver.post(
         '/teswh/event',
-        rawBodyMiddleware,
-        express.json(),
         verifySignature(secret),
         (req: WebhookRequest, res: Response) => {
             Logger.debug("Incoming webhook event request")
